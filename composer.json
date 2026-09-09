@@ -1,0 +1,63 @@
+{
+    "name": "salvamatavele/zumbopay-laravel",
+    "description": "Biblioteca oficial e robusta de pagamentos ZumboPay para Laravel (M-Pesa, e-Mola, mKesh e Cartões)",
+    "keywords": [
+        "zumbopay",
+        "laravel",
+        "mpesa",
+        "emola",
+        "mkesh",
+        "payments",
+        "mozambique",
+        "fintech",
+        "stk-push",
+        "vodacom",
+        "movitel",
+        "tmcel"
+    ],
+    "homepage": "https://github.com/salvamatavele/zumbopay-laravel",
+    "support": {
+        "issues": "https://github.com/salvamatavele/zumbopay-laravel/issues",
+        "source": "https://github.com/salvamatavele/zumbopay-laravel"
+    },
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Salva Matavele",
+            "email": "salva@dryacademic.mz"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/http": "^10.0|^11.0|^12.0|^13.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.0|^3.0|^4.0",
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^8.0|^9.0|^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZumboPay\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZumboPay\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ZumboPay\\Laravel\\ZumboPayServiceProvider"
+            ],
+            "aliases": {
+                "ZumboPay": "ZumboPay\\Laravel\\Facades\\ZumboPay"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

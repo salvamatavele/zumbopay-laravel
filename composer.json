@@ -24,8 +24,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Salva Matavele",
-            "email": "salva@dryacademic.mz"
+            "name": "Salvado Matavele",
+            "email": "smatavele1@gmail.com"
         }
     ],
     "require": {
@@ -58,6 +58,6 @@
             }
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "beta",
     "prefer-stable": true
 }

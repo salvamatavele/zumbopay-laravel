@@ -21,6 +21,12 @@ use ZumboPay\ZumboPayClient;
  * @method static array listWallets()
  * @method static ?string resolveWalletIdForChannel(string $channel)
  * @method static ?string resolveWalletIdForPhone(string $phone)
+ * @method static bool isEnabled()
+ * @method static ZumboPayClient setEnabled(bool $enabled)
+ * @method static ZumboPayClient enable()
+ * @method static ZumboPayClient disable()
+ * @method static string getDisabledMessage()
+ * @method static ZumboPayClient setDisabledMessage(string $message)
  *
  * @see ZumboPayClient
  */

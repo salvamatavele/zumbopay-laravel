@@ -19,4 +19,16 @@ interface ZumboPayInterface
     public function validateWebhook(string $rawPayload, ?string $signature): bool;
 
     public function listWallets(): array;
+
+    public function isEnabled(): bool;
+
+    public function setEnabled(bool $enabled): self;
+
+    public function enable(): self;
+
+    public function disable(): self;
+
+    public function getDisabledMessage(): string;
+
+    public function setDisabledMessage(string $message): self;
 }

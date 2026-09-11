@@ -24,6 +24,8 @@ class ZumboPayClient implements ZumboPayInterface
         protected string $baseUrl = 'https://zumbopay.com/api/public/v1',
         protected ?string $webhookSecret = null,
         protected array $wallets = [],
+        protected bool $enabled = true,
+        protected string $disabledMessage = 'Os pagamentos via ZumboPay encontram-se temporariamente suspensos para manutenção.',
     ) {}
 
     public static function fromConfig(array $config): self
@@ -34,7 +36,43 @@ class ZumboPayClient implements ZumboPayInterface
             baseUrl: (string) ($config['base_url'] ?? 'https://zumbopay.com/api/public/v1'),
             webhookSecret: $config['webhook_secret'] ?? null,
             wallets: (array) ($config['wallets'] ?? []),
+            enabled: (bool) ($config['enabled'] ?? true),
+            disabledMessage: (string) ($config['disabled_message'] ?? 'Os pagamentos via ZumboPay encontram-se temporariamente suspensos para manutenção.'),
         );
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): self
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function enable(): self
+    {
+        return $this->setEnabled(true);
+    }
+
+    public function disable(): self
+    {
+        return $this->setEnabled(false);
+    }
+
+    public function getDisabledMessage(): string
+    {
+        return $this->disabledMessage;
+    }
+
+    public function setDisabledMessage(string $message): self
+    {
+        $this->disabledMessage = $message;
+
+        return $this;
     }
 
     public function isValidUuid(?string $value): bool
@@ -137,6 +175,22 @@ class ZumboPayClient implements ZumboPayInterface
      */
     public function charge(ChargeRequest $request): ChargeResponse
     {
+        if (! $this->isEnabled()) {
+            Log::info('ZumboPay payment charge skipped: gateway is disabled (silenciador ativo).', [
+                'reference' => $request->reference,
+                'phone' => $request->phone,
+            ]);
+
+            return new ChargeResponse(
+                success: false,
+                status: Status::Error,
+                reference: null,
+                message: $this->disabledMessage,
+                code: 'GATEWAY_DISABLED',
+                raw: ['disabled' => true],
+            );
+        }
+
         $msisdn = PhoneNormalizer::normalize($request->phone);
         $walletId = $request->walletId ?: $this->resolveWalletIdForPhone($msisdn);
 
@@ -244,6 +298,21 @@ class ZumboPayClient implements ZumboPayInterface
      */
     public function checkout(CheckoutRequest $request): CheckoutResponse
     {
+        if (! $this->isEnabled()) {
+            Log::info('ZumboPay payment checkout skipped: gateway is disabled (silenciador ativo).', [
+                'reference' => $request->reference,
+                'amount' => $request->amount,
+            ]);
+
+            return new CheckoutResponse(
+                success: false,
+                checkoutUrl: null,
+                reference: null,
+                message: $this->disabledMessage,
+                raw: ['disabled' => true],
+            );
+        }
+
         $walletId = $request->walletId ?: $this->resolveWalletIdForChannel('card') ?: $this->resolveWalletIdForChannel('mpesa');
 
         $payload = [

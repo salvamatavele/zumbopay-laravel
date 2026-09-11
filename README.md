@@ -68,7 +68,38 @@ ZUMBOPAY_WALLET_MPESA=""
 ZUMBOPAY_WALLET_EMOLA=""
 ZUMBOPAY_WALLET_MKESH=""
 ZUMBOPAY_WALLET_CARD=""
+
+# Silenciador / Kill-Switch (Opcional - Padrão: true):
+ZUMBOPAY_ENABLED=true
+ZUMBOPAY_DISABLED_MESSAGE="Os pagamentos via ZumboPay encontram-se temporariamente suspensos para manutenção."
 ```
+
+---
+
+### Silenciador / Kill-Switch (Resiliência Operacional)
+
+Se a ZumboPay ou as operadoras móveis entrarem em manutenção programada ou instabilidade imprevista, você pode desativar as cobranças imediatamente:
+
+1. **Via `.env`**:
+   ```env
+   ZUMBOPAY_ENABLED=false
+   ```
+2. **Programaticamente em tempo de execução**:
+   ```php
+   use ZumboPay\Laravel\Facades\ZumboPay;
+
+   // Desativa cobranças (nenhuma chamada HTTP externa será disparada)
+   ZumboPay::disable();
+
+   // Verifica estado
+   if (!ZumboPay::isEnabled()) {
+       // Silenciado
+   }
+
+   // Reativa cobranças
+   ZumboPay::enable();
+   ```
+Quando silenciado, `stkPush()`, `charge()` e `createCheckout()` retornam `success: false` com `code: 'GATEWAY_DISABLED'` e a mensagem amigável de manutenção, sem quebrar o fluxo do sistema nem gerar timeouts.
 
 ---
 

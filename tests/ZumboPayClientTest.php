@@ -146,4 +146,67 @@ class ZumboPayClientTest extends TestCase
         $this->assertEquals('mkesh', $status->channel);
         $this->assertEquals(1500.00, $status->amount);
     }
+
+    public function test_kill_switch_silences_charges_and_avoids_http(): void
+    {
+        Http::fake();
+
+        $client = new ZumboPayClient(
+            apiKey: 'key',
+            merchantId: 'merchant',
+            enabled: false,
+            disabledMessage: 'Serviço em manutenção.'
+        );
+
+        $this->assertFalse($client->isEnabled());
+
+        $response = $client->stkPush(
+            phone: '841234567',
+            amount: 1000.00,
+            reference: 'REF-SILENCED'
+        );
+
+        $this->assertFalse($response->success);
+        $this->assertEquals(Status::Error, $response->status);
+        $this->assertEquals('GATEWAY_DISABLED', $response->code);
+        $this->assertEquals('Serviço em manutenção.', $response->message);
+        $this->assertTrue($response->raw['disabled'] ?? false);
+
+        // Garante que absolutamente NENHUMA chamada HTTP foi feita!
+        Http::assertNothingSent();
+    }
+
+    public function test_kill_switch_silences_checkout_and_avoids_http(): void
+    {
+        Http::fake();
+
+        $client = new ZumboPayClient(
+            apiKey: 'key',
+            merchantId: 'merchant',
+            enabled: false
+        );
+
+        $response = $client->createCheckout(
+            amount: 500.00,
+            reference: 'REF-CHECKOUT-SILENCED'
+        );
+
+        $this->assertFalse($response->success);
+        $this->assertNull($response->checkoutUrl);
+        $this->assertTrue($response->raw['disabled'] ?? false);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_dynamic_enable_and_disable_toggles(): void
+    {
+        $client = new ZumboPayClient('key', 'merchant');
+        $this->assertTrue($client->isEnabled());
+
+        $client->disable();
+        $this->assertFalse($client->isEnabled());
+
+        $client->enable();
+        $this->assertTrue($client->isEnabled());
+    }
 }

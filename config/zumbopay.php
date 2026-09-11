@@ -16,6 +16,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Silenciador / Kill-Switch
+    |--------------------------------------------------------------------------
+    |
+    | Permite suspender ou silenciar imediatamente todas as tentativas de
+    | pagamento sem lançar exceções ou quebrar o fluxo da aplicação.
+    |
+    */
+    'enabled' => (bool) env('ZUMBOPAY_ENABLED', true),
+    'disabled_message' => env('ZUMBOPAY_DISABLED_MESSAGE', 'Os pagamentos via ZumboPay encontram-se temporariamente suspensos para manutenção.'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Carteiras Pré-configuradas (Opcional)
     |--------------------------------------------------------------------------
     |
